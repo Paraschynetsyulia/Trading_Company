@@ -122,5 +122,30 @@ namespace DAL.ADO
                 return customer;
             }
         }
+        public List<CustomersDTO> GetCustomerbyIDOrder(int orId)
+        {
+            using (SqlConnection conn = new SqlConnection(this._connStr))
+            using (SqlCommand comm = conn.CreateCommand())
+            {
+                comm.CommandText = $"select* from Customers where OrderID={orId}";
+                conn.Open();
+                SqlDataReader reader = comm.ExecuteReader();
+                var myCustomer = new List<CustomersDTO> ();
+                while (reader.Read())
+                {
+                    myCustomer.Add(new CustomersDTO
+                    {
+                        CustomerID = (int)reader["CustomerID"],
+                        OrderID = (int)reader["OrderID"],
+                        FirstName = reader["FirstName"].ToString(),
+                        LastName = reader["LastName"].ToString(),
+                        Discount = (int)reader["Discount"],
+                        RowInsertTime = (DateTime)reader["RowInsertTime"],
+
+                    });
+                }
+                return myCustomer;
+            }
+        }
     }
 }

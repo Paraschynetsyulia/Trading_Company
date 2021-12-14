@@ -14,5 +14,7 @@ namespace DAL.Interfaces
         UsersDTO UpdateUser (UsersDTO user, int id);
         UsersDTO CreateUser(UsersDTO user);
         void DeleteUser(int userId);
+        bool Login(string login, string password);
+        UsersDTO GetUserbyLogin(string login);
     }
 }

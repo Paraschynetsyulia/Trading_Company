@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Collections.Generic;
 using DTO;
 
 namespace DAL.Interfaces
@@ -14,5 +10,6 @@ namespace DAL.Interfaces
         CustomersDTO UpdateCustomer(CustomersDTO customer, int ID);
         CustomersDTO CreateCustomer(CustomersDTO customer);
         void DeleteCustomer(int customerId);
+        List<CustomersDTO> GetCustomerbyIDOrder(int id);
     }
 }

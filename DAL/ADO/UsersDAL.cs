@@ -2,10 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using DTO;
 using DAL.Interfaces;
 using System.Data.SqlClient;
+using System.Security.Cryptography;
 
 namespace DAL.ADO
 {
@@ -71,7 +71,8 @@ namespace DAL.ADO
                         FirstName = reader["FirstName"].ToString(),
                         LastName = reader["LastName"].ToString(),
                         Login = reader["Login"].ToString(),
-                        Password = reader["Password"].ToString(),
+                        Password = (byte[])reader["Password"],
+                        S=(Guid)reader["S"],
                         RowInsertTime = DateTime.Parse(reader["RowInsertTime"].ToString())
                     });
                 }
@@ -122,6 +123,42 @@ namespace DAL.ADO
                 user.UserID = (int)comm.ExecuteScalar();
                 conn.Close();
                 return user;
+            }
+        }
+        private byte[] hash(string password, string s)
+        {
+            var pass = SHA512.Create();
+            byte[] b = pass.ComputeHash(Encoding.UTF8.GetBytes(password + s));
+            return b;
+        }
+        public bool Login(string login, string password)
+        {
+            foreach(UsersDTO u in GetAllUsers())
+                if (u.Password.SequenceEqual(hash(password, u.S.ToString())) == true)
+                {
+                    return true;
+                }
+                return false;
+        }
+        public UsersDTO GetUserbyLogin(string login)
+        {
+            using (SqlConnection conn=new SqlConnection(this._connStr))
+            using(SqlCommand comm = conn.CreateCommand())
+            {
+                comm.CommandText = $"select* from Users where Login={login}";
+                conn.Open();
+                SqlDataReader reader = comm.ExecuteReader();
+                UsersDTO myUser = new UsersDTO();
+                while (reader.Read())
+                {
+                    myUser = new UsersDTO
+                    {
+                        UserID = (int)reader["UserID"],
+                        RoleID = (int)reader["RoleID"],
+                        Login = reader["Login"].ToString(),
+                    };
+                }
+                return myUser;
             }
         }
     }
